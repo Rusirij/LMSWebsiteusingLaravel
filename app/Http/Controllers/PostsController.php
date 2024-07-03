@@ -41,6 +41,7 @@ class PostsController extends Controller
         $post = new Post;
         $post->title = $request->input('title');
         $post->body = $request->input('body');
+        $post->user_id = auth()->user()->id;
         $post-> save();
 
         // Redirect or return response
@@ -61,7 +62,8 @@ class PostsController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $post =  Post::find($id);
+        return view('posts.edit', compact('post'));
     }
 
     /**
@@ -69,7 +71,19 @@ class PostsController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        // Validate the request
+        $request->validate([
+            'title' => 'required',
+            'body' => 'required'
+        ]);
+
+        $post =  Post::find($id);
+        $post->title = $request->input('title');
+        $post->body = $request->input('body');
+        $post-> save();
+
+        // Redirect or return response
+        return redirect('/posts')->with('success', 'Post updated.');
     }
 
     /**
@@ -77,6 +91,11 @@ class PostsController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $post =  Post::find($id);
+        $post-> delete();
+
+        return redirect('/posts')->with('success', 'Post deleted.');
+
+        
     }
 }
